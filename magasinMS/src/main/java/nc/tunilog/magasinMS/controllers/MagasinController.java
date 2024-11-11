@@ -2,6 +2,8 @@ package nc.tunilog.magasinMS.controllers;
 
 import nc.tunilog.magasinMS.models.Magasin;
 import nc.tunilog.magasinMS.services.MagasinService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,20 +13,27 @@ import java.util.List;
 @RestController
 @RequestMapping("magasins")
 public class MagasinController {
+    private static final Logger logger = LoggerFactory.getLogger(MagasinController.class);
     @Autowired
     private MagasinService magasinService;
 
     @GetMapping()
     public ResponseEntity<Object> allMagasin(){
         List<Magasin> magasins = magasinService.allMagasins();
-        if(magasins.isEmpty())
+        if(magasins.isEmpty()){
+            logger.warn("No magasins found in the database.");
             return ResponseEntity
-                    .status(404)
-                    .body("MN_Info: There is no storage saved in data base! Try to create one.");
-        else
+                .status(404)
+                .body("MN_Info: There is no storage saved in data base! Try to create one.");
+
+        }
+        else{
+            logger.info("Magasins found: " + magasins.size() + " magasins.");
             return ResponseEntity
                     .status(200)
                     .body(magasins);
+        }
+
 
     }
     @PostMapping("/add")
